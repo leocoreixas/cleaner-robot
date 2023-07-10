@@ -137,15 +137,16 @@ a_star(_, _, _, _, [], _, _, _).
 limpar_sala(Algoritmo) :-
     sala(Mapa),
     length(Mapa, Altura),
-    length(Mapa, Largura),
+    nth0(0, Mapa, PrimeiroElemento),
+    length(PrimeiroElemento, Largura),
     inicio(XInicial, YInicial),
     fim(XFinal, YFinal),
-    (
-        (Algoritmo = best_first, best_first(XInicial, YInicial, XFinal, YFinal, Caminho, [posicao(XInicial, YInicial)]));
-        (Algoritmo = branch_and_bound, branch_and_bound(XInicial, YInicial, XFinal, YFinal, Caminho, [posicao(XInicial, YInicial)], 0, Altura * Largura));
-		(Algoritmo = hill_climbing, hill_climbing(XInicial, YInicial, XFinal, YFinal, Caminho, [posicao(XInicial, YInicial)]));
-        (Algoritmo = a_star, a_star(XInicial, YInicial, XFinal, YFinal, Caminho, [posicao(XInicial, YInicial)], 0, Altura * Largura))
-    ),
+    %(
+    %    (Algoritmo = best_first, best_first(XInicial, YInicial, XFinal, YFinal, Caminho, [posicao(XInicial, YInicial)]));
+    %    (Algoritmo = branch_and_bound, branch_and_bound(XInicial, YInicial, XFinal, YFinal, Caminho, [posicao(XInicial, YInicial)], 0, Altura * Largura));
+	%	(Algoritmo = hill_climbing, hill_climbing(XInicial, YInicial, XFinal, YFinal, Caminho, [posicao(XInicial, YInicial)]));
+    %    (Algoritmo = a_star, a_star(XInicial, YInicial, XFinal, YFinal, Caminho, [posicao(XInicial, YInicial)], 0, Altura * Largura))
+    %),
     percorrer_caminho(Caminho).
 
 % Predicado para percorrer o caminho e limpar as posições
@@ -159,5 +160,3 @@ percorrer_caminho([movimento(X1, Y1, X2, Y2) | Resto]) :-
     ),
     percorrer_caminho(Resto).
     
-    
- 
