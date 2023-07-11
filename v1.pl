@@ -3,19 +3,13 @@
 
 sala([
     [_, _, _, _, _],
+    [_, s, _, _, _],
     [_, _, _, _, _],
-    [_, _, _, _, _],
-    [_, _, _, _, _],
+    [_, _, o, o, _],
     [_, _, _, _, _]
 ]).
 
-% Definição das posições iniciais e final
-inicio(0, 0).
-fim(4, 4).
-
-% Definição das posições com sujeira
-sujeira(3, 2).
-sujeira(4, 4).
+sujeira(1,1).
 
 % Definição das posições com obstáculos
 obstaculo(2, 3).
@@ -27,14 +21,13 @@ movimento(baixo).
 movimento(esquerda).
 movimento(direita).
 
+
 % Verifica se uma posição é válida no mapa
 posicao_valida(X, Y) :-
     sala(Mapa),
     nth0(Y, Mapa, Linha),
     nth0(X, Linha, _),
-    \+ obstaculo(X, Y),
-    var(Elemento). %  verifica se a variável Elemento é uma variável não instanciada
-
+    \+ obstaculo(X, Y).
 
 % Movimenta o robô para uma nova posição
 mover(X, Y, X2, Y2) :-
@@ -51,14 +44,7 @@ mover(X, Y, X2, Y2) :-
 % Calcula a distância de Manhattan entre duas posições
 distancia_manhattan(X1, Y1, X2, Y2, Distancia) :-
     Distancia is abs(X2 - X1) + abs(Y2 - Y1).
-
-% Heurística de avaliação (distância de Manhattan)
-heuristica_avaliacao(X1, Y1, X2, Y2, Avaliacao) :-
-    distancia_manhattan(X1, Y1, X2, Y2, Avaliacao).
-
-
-
-
+    
 
 % Verifica se a posição atual é o objetivo
 chegou_ao_objetivo(X, Y, ObjetivoX, ObjetivoY) :-
@@ -66,24 +52,27 @@ chegou_ao_objetivo(X, Y, ObjetivoX, ObjetivoY) :-
     Y = ObjetivoY.
 
 % Verifica se a posição atual é uma posição já visitada
-ja_visitado(_, _, []).
-ja_visitado(X, Y, [posicao(X2, Y2) | Resto]) :-
-    X = X2,
-    Y = Y2;
+ja_visitado(X, Y, [posicao(X1, Y1) | _]) :-
+    X = X1,
+    Y = Y1.
+ja_visitado(X, Y, [_ | Resto]) :-
     ja_visitado(X, Y, Resto).
 
 % Encontra o melhor movimento a partir da posição atual
-melhor_movimento(X, Y, ObjetivoX, ObjetivoY, Movimento) :-
-    findall(
-        Distancia,
-        (mover(X, Y, X2, Y2), \+ ja_visitado(X2, Y2, Movimento), distancia_manhattan(X2, Y2, ObjetivoX, ObjetivoY, Distancia)),
-        Movimentos
-    ),
-    sort(Movimentos, MovimentosOrdenados),
-    MovimentosOrdenados = [_ | _], % Verifica se a lista não está vazia
-    min_member(MinDistancia, MovimentosOrdenados),
-    mover(X, Y, X3, Y3),
-    distancia_manhattan(X3, Y3, ObjetivoX, ObjetivoY, MinDistancia).
+melhor_movimento(X, Y, ObjetivoX, ObjetivoY, Movimento, MelhorDistancia) :-
+    movimento(Movimento),
+    mover(X, Y, X2, Y2),
+    \+ ja_visitado(X2, Y2, Movimento),
+    distancia_manhattan(X2, Y2, ObjetivoX, ObjetivoY, Distancia),
+    (
+        MelhorDistancia = -1, % Inicializa a melhor distância se for a primeira iteração
+        melhor_movimento(X, Y, ObjetivoX, ObjetivoY, Movimento, Distancia)
+    ;
+        Distancia < MelhorDistancia, % Atualiza a melhor distância se encontrarmos uma menor
+        melhor_movimento(X, Y, ObjetivoX, ObjetivoY, Movimento, Distancia)
+    ;
+        true % Não faz nada se a distância não for melhor
+    ).
 
 % Algoritmo de Hill Climbing
 hill_climbing(X, Y, ObjetivoX, ObjetivoY, Caminho, Visitados) :-
@@ -91,25 +80,13 @@ hill_climbing(X, Y, ObjetivoX, ObjetivoY, Caminho, Visitados) :-
     reverse([posicao(X, Y) | Visitados], Caminho).
 
 hill_climbing(X, Y, ObjetivoX, ObjetivoY, Caminho, Visitados) :-
-    melhor_movimento(X, Y, ObjetivoX, ObjetivoY, Movimento),
+    melhor_movimento(X, Y, ObjetivoX, ObjetivoY, _, -1), % Inicializa a melhor distância como -1
     mover(X, Y, X2, Y2),
-    \+ ja_visitado(X2, Visitados, Y2),
+    \+ ja_visitado(X2, Y2, Visitados),
     hill_climbing(X2, Y2, ObjetivoX, ObjetivoY, Caminho, [posicao(X, Y) | Visitados]).
 
 
 
-
-
-% Predicado para limpar a sala usando o algoritmo A*
-%limpar_sala(Algoritmo) :-
-%    sala(Mapa),
-%    length(Mapa, Altura),
-%    nth0(0, Mapa, PrimeiroElemento),
-%    length(PrimeiroElemento, Largura),
-%    inicio(XInicial, YInicial),
-%    sujeira(Objetivo1X, Objetivo1y), %Trocar para iteração
-%    hill_climbing(XInicial, YInicial, Objetivo1X, Objetivo1y, Caminho, []).
-    %percorrer_caminho(Caminho).
-
-    
-
+limpar_sala(Caminho):-
+    sujeira(X,Y),
+    hill_climbing(0, 0, X, Y, Caminho, []).
