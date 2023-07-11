@@ -52,3 +52,6 @@ best_first(CurrentState, Path) :-
     choose_next_state(CurrentState, NextState),
     best_first(NextState, NextPath),
     Path = [CurrentState | NextPath]. % Constrói o caminho
+
+% Exemplo de uso:
+best_first((0, 0), Path).
