@@ -54,12 +54,5 @@ branch_and_bound(CurrentState, Path) :-
     branch_and_bound(NextState, NextPath),
     Path = [CurrentState | NextPath]. % Constrói o caminho
 
-% Definir predicado para calcular a distância total percorrida em um caminho
-calculate_path_distance([], 0).
-calculate_path_distance([State1, State2 | Rest], Distance) :-
-    manhattan_distance(State1, State2, SegmentDistance),
-    calculate_path_distance([State2 | Rest], RestDistance),
-    Distance is SegmentDistance + RestDistance.
-
 % Exemplo de uso:
 %branch_and_bound((0, 0), Path).
