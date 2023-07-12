@@ -1,5 +1,5 @@
-%Definir o tamanho da sala
-room_size(4,4).
+% Definir o tamanho da sala
+room_size(4, 4).
 
 % Definir predicado para representar a posição da sujeira
 goal_state((1, 1)).
@@ -14,44 +14,63 @@ valid_position((X, Y)) :-
     X >= 0, X < MaxX,
     Y >= 0, Y < MaxY.
 
-% Definir predicado para representar a posição inicial do robô
-%initial_state((0, 0)).
-
 % Definir predicado para gerar os sucessores de um estado
 successor((X, Y), (NextX, Y)) :- NextX is X + 1. % Movimento para a direita
 successor((X, Y), (NextX, Y)) :- NextX is X - 1. % Movimento para a esquerda
 successor((X, Y), (X, NextY)) :- NextY is Y + 1. % Movimento para cima
 successor((X, Y), (X, NextY)) :- NextY is Y - 1. % Movimento para baixo
 
-% Definir predicado para escolher o próximo estado com base na heurística
-choose_next_state(CurrentState, NextState) :-
-    bagof(NextState, (successor(CurrentState, NextState), valid_position(NextState)), NextStates),
-    evaluate_states(NextStates, CurrentState, NextState).
-
 % Definir predicado para calcular a distância de Manhattan entre dois pontos
 manhattan_distance((X1, Y1), (X2, Y2), Distance) :-
     Distance is abs(X1 - X2) + abs(Y1 - Y2).
 
-% Definir predicado para avaliar os estados possíveis com base na heurística (distância de Manhattan)
-evaluate_states([State], _, State).
-evaluate_states([State1, State2 | Rest], CurrentState, BestState) :-
-    goal_state(GoalState), % Obter a posição da sujeira. Funciona se tiver mais de uma sujeira?
-    manhattan_distance(State1, GoalState, Distance1),
-    manhattan_distance(State2, GoalState, Distance2),
-    manhattan_distance(CurrentState, GoalState, CurrentDistance),
-    (Distance1 + CurrentDistance =< Distance2 + CurrentDistance ->
-        evaluate_states([State1 | Rest], CurrentState, BestState)
-    ;
-        evaluate_states([State2 | Rest], CurrentState, BestState)
-    ).
+% Definir predicado para calcular o custo do caminho atual
+calculate_path_cost([_], 0).
+calculate_path_cost([State1, State2 | Path], Cost) :-
+    manhattan_distance(State1, State2, SegmentCost),
+    calculate_path_cost([State2 | Path], RestCost),
+    Cost is RestCost + SegmentCost.
 
-% Definir predicado para buscar o caminho usando a busca Hill Climbing
-hill_climbing(CurrentState, Path) :-
+% Definir predicado para buscar o caminho usando a busca Branch and Bound
+branch_and_bound(CurrentState, Path) :-
+    branch_and_bound([(CurrentState, [CurrentState], 0)], [], Path).
+
+% Definir predicado para expandir um estado e obter seus sucessores
+expand_state((State, Path, _), Successors) :-
+    findall((NextState, [NextState | Path], NextCost), (
+        successor(State, NextState),
+        valid_position(NextState),
+        \+ member(NextState, Path),
+        manhattan_distance(State, NextState, Distance),
+        calculate_path_cost([NextState | Path], PathCost),
+        NextCost is PathCost + Distance
+    ), Successors).
+
+% Definir predicado para buscar o melhor caminho usando a busca Branch and Bound
+branch_and_bound([], CurrentBestPath, CurrentBestPath).
+% Caso base: quando a lista de estados a serem explorados está vazia,
+% o CurrentBestPath é o melhor caminho encontrado até o momento.
+
+branch_and_bound([(CurrentState, CurrentPath, CurrentCost) | Rest], CurrentBestPath, FinalBestPath) :-
     goal_state(CurrentState),
-    Path = [CurrentState]. % Chegamos ao estado objetivo, retorna o caminho
-hill_climbing(CurrentState, Path) :-
-    choose_next_state(CurrentState, NextState),
-    hill_climbing(NextState, NextPath),
-    Path = [CurrentState | NextPath]. % Constrói o caminho
+    calculate_path_cost(CurrentPath, PathCost),
+    PathCost < CurrentCost,
+    branch_and_bound([], CurrentPath, FinalBestPath).
+% Cláusula que é executada quando o estado atual é o estado objetivo.
+% Verifica se o custo do caminho atual é menor que o custo atualmente armazenado.
+% Se for, encontramos um caminho melhor e chamamos branch_and_bound/3 novamente
+% com a lista vazia e o CurrentPath como FinalBestPath.
 
-%hill_climbing((0, 0), Path).
+branch_and_bound([(CurrentState, CurrentPath, CurrentCost) | Rest], CurrentBestPath, FinalBestPath) :-
+    expand_state((CurrentState, CurrentPath, CurrentCost), Expanded),
+    append(Rest, Expanded, NewQueue),
+    branch_and_bound(NewQueue, CurrentBestPath, FinalBestPath).
+% Cláusula recursiva que expande o estado atual e obtém seus sucessores.
+% Em seguida, anexa os sucessores à lista Rest e à Expanded.
+% Chama branch_and_bound/3 novamente com a nova fila de estados (NewQueue).
+
+
+
+start_branch_and_bound(Path) :-
+    branch_and_bound((0, 0), TempPath),
+    reverse(TempPath, Path).

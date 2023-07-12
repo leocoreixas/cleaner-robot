@@ -23,35 +23,35 @@ successor((X, Y), (NextX, Y)) :- NextX is X - 1. % Movimento para a esquerda
 successor((X, Y), (X, NextY)) :- NextY is Y + 1. % Movimento para cima
 successor((X, Y), (X, NextY)) :- NextY is Y - 1. % Movimento para baixo
 
-% Definir predicado para escolher o próximo estado com base na heurística
-choose_next_state(CurrentState, NextState) :-
-    bagof(NextState, (successor(CurrentState, NextState), valid_position(NextState)), NextStates),
-    evaluate_states(NextStates, CurrentState, NextState).
-
 % Definir predicado para calcular a distância de Manhattan entre dois pontos
 manhattan_distance((X1, Y1), (X2, Y2), Distance) :-
     Distance is abs(X1 - X2) + abs(Y1 - Y2).
 
+% Definir predicado para escolher o próximo estado com base na heurística
+choose_next_state(CurrentState, NextState) :-
+    bagof(NextState, (successor(CurrentState, NextState), valid_position(NextState)), NextStates),
+    evaluate_states(NextStates, NextState).
+
 % Definir predicado para avaliar os estados possíveis com base na heurística (distância de Manhattan)
-evaluate_states([State], _, State).
-evaluate_states([State1, State2 | Rest], CurrentState, BestState) :-
-    goal_state(GoalState), % Obter a posição da sujeira. Funciona se tiver mais de uma sujeira?
+evaluate_states([State], State).
+evaluate_states([State1, State2 | Rest], BestState) :-
+    goal_state(GoalState),
     manhattan_distance(State1, GoalState, Distance1),
     manhattan_distance(State2, GoalState, Distance2),
-    manhattan_distance(CurrentState, GoalState, CurrentDistance),
-    (Distance1 + CurrentDistance =< Distance2 + CurrentDistance ->
-        evaluate_states([State1 | Rest], CurrentState, BestState)
+    (Distance1 =< Distance2 ->
+        evaluate_states([State1 | Rest], BestState)
     ;
-        evaluate_states([State2 | Rest], CurrentState, BestState)
+        evaluate_states([State2 | Rest], BestState)
     ).
 
-% Definir predicado para buscar o caminho usando a busca Hill Climbing
-hill_climbing(CurrentState, Path) :-
+% Definir predicado para buscar o caminho usando a busca Best-First
+best_first(CurrentState, Path) :-
     goal_state(CurrentState),
     Path = [CurrentState]. % Chegamos ao estado objetivo, retorna o caminho
-hill_climbing(CurrentState, Path) :-
+best_first(CurrentState, Path) :-
     choose_next_state(CurrentState, NextState),
-    hill_climbing(NextState, NextPath),
+    best_first(NextState, NextPath),
     Path = [CurrentState | NextPath]. % Constrói o caminho
 
-%hill_climbing((0, 0), Path).
+% Exemplo de uso:
+best_first((0, 0), Path).
