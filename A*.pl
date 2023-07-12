@@ -65,6 +65,14 @@ evaluate_states([State1, State2 | Rest], StartState, BestState, AccumulatedCost)
         evaluate_states([State2 | Rest], StartState, BestState, AccumulatedCost)
     ).
 
+% Predicado para verificar se uma posição não foi visitada
+check_not_visited((X, Y), Path) :-
+    var(Path).
+    
+check_not_visited((X, Y), Path) :-
+    \+ member(((X, Y), _), Path).
+
+
 % Definir predicado para escolher o próximo estado com base na heurística (A*)
 choose_next_state(CurrentState, Path, NextState) :-
     bagof((Position, Cost), (
@@ -72,6 +80,7 @@ choose_next_state(CurrentState, Path, NextState) :-
         valid_position((Position, _))
     ), Successors),
     evaluate_states(Successors, CurrentState, NextState, _),
+    check_not_visited(NextState, Path),                
     append(Path, [NextState], NewPath),
     accumulate_cost(CurrentState, NewPath, _, _).
 
@@ -84,3 +93,5 @@ a_star(CurrentState, Path, TotalCost) :-
 a_star(CurrentState, Path, TotalCost) :-
     choose_next_state(CurrentState, Path, NextState),
     a_star(NextState, [NextState | Path], TotalCost).
+
+
