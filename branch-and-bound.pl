@@ -1,5 +1,5 @@
 % Definir o tamanho da sala
-room_size(4,4).
+room_size(4, 4).
 
 % Definir predicado para representar a posição da sujeira
 goal_state((1, 1)).
@@ -25,52 +25,38 @@ manhattan_distance((X1, Y1), (X2, Y2), Distance) :-
     Distance is abs(X1 - X2) + abs(Y1 - Y2).
 
 % Definir predicado para calcular o custo do caminho atual
-calculate_path_cost([State | Path], Cost) :-
-    calculate_path_cost([State | Path], 0, Cost).
-
-calculate_path_cost([_], Cost, Cost).
-calculate_path_cost([State1, State2 | Path], AccCost, Cost) :-
+calculate_path_cost([_], 0).
+calculate_path_cost([State1, State2 | Path], Cost) :-
     manhattan_distance(State1, State2, SegmentCost),
-    NewAccCost is AccCost + SegmentCost,
-    calculate_path_cost([State2 | Path], NewAccCost, Cost).
+    calculate_path_cost([State2 | Path], RestCost),
+    Cost is RestCost + SegmentCost.
 
 % Definir predicado para buscar o caminho usando a busca Branch and Bound
 branch_and_bound(CurrentState, Path) :-
-    calculate_path_cost([CurrentState], CurrentCost),
-    branch_and_bound([(CurrentState, CurrentCost)], [], Path).
-
-% Definir predicado auxiliar para buscar o caminho usando a busca Branch and Bound
-branch_and_bound([], CurrentBestPath, CurrentBestPath).
-branch_and_bound([(CurrentState, CurrentCost) | Rest], CurrentBestPath, FinalBestPath) :-
-    goal_state(CurrentState),
-    calculate_path_cost([CurrentState | Rest], CurrentPathCost),
-    CurrentPathCost < CurrentCost,
-    branch_and_bound(Rest, [CurrentState | Rest], FinalBestPath).
-branch_and_bound([(CurrentState, CurrentCost) | Rest], CurrentBestPath, FinalBestPath) :-
-    expand_state((CurrentState, CurrentCost), Expanded),
-    append(Rest, Expanded, NewQueue),
-    select_best_state(NewQueue, Selected),
-    branch_and_bound(Selected, CurrentBestPath, FinalBestPath).
+    branch_and_bound([(CurrentState, [CurrentState], 0)], [], Path).
 
 % Definir predicado para expandir um estado e obter seus sucessores
-expand_state((State, _), Successors) :-
-    findall((NextState, NextCost), (
+expand_state((State, Path, _), Successors) :-
+    findall((NextState, [NextState | Path], NextCost), (
         successor(State, NextState),
         valid_position(NextState),
-        manhattan_distance(NextState, State, Distance),
-        NextCost is Distance + 1
+        \+ member(NextState, Path),
+        manhattan_distance(State, NextState, Distance),
+        calculate_path_cost([NextState | Path], PathCost),
+        NextCost is PathCost + Distance
     ), Successors).
 
-% Definir predicado para selecionar o melhor estado com menor custo
-select_best_state([State | Rest], Selected) :-
-    select_best_state(Rest, State, Selected).
-
-select_best_state([], BestState, BestState).
-select_best_state([(State, Cost) | Rest], (BestState, BestCost), Selected) :-
-    Cost < BestCost,
-    select_best_state(Rest, (State, Cost), Selected).
-select_best_state([_ | Rest], (BestState, BestCost), Selected) :-
-    select_best_state(Rest, (BestState, BestCost), Selected).
+% Definir predicado para buscar o melhor caminho usando a busca Branch and Bound
+branch_and_bound([], CurrentBestPath, CurrentBestPath).
+branch_and_bound([(CurrentState, CurrentPath, CurrentCost) | Rest], CurrentBestPath, FinalBestPath) :-
+    goal_state(CurrentState),
+    calculate_path_cost(CurrentPath, PathCost),
+    PathCost < CurrentCost,
+    branch_and_bound(Rest, CurrentPath, FinalBestPath).
+branch_and_bound([(CurrentState, CurrentPath, CurrentCost) | Rest], CurrentBestPath, FinalBestPath) :-
+    expand_state((CurrentState, CurrentPath, CurrentCost), Expanded),
+    append(Rest, Expanded, NewQueue),
+    branch_and_bound(NewQueue, CurrentBestPath, FinalBestPath).
 
 % Exemplo de uso:
 %branch_and_bound((0, 0), Path).
