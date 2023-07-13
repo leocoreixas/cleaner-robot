@@ -89,5 +89,3 @@ a_star_all(FinalPath) :-
     append([(0,0)], AllGoalPositions, AllStartPositions),
     call_a_star(AllStartPositions, Path),
     remove_last(Path, FinalPath).
-
-
