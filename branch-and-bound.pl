@@ -44,33 +44,32 @@ expand_state((State, Path, _), Successors) :-
         NextCost is PathCost + Distance
     ), Successors).
 
-% Definir predicado para buscar o caminho usando a busca Branch and Bound
+
 branch_and_bound(CurrentState, Path) :-
     branch_and_bound([(CurrentState, [CurrentState], 0)], [], Path).
 
-% Definir predicado para buscar o melhor caminho usando a busca Branch and Bound
-branch_and_bound([], CurrentBestPath, CurrentBestPath).
 % Caso base: quando a lista de estados a serem explorados está vazia,
 % o CurrentBestPath é o melhor caminho encontrado até o momento.
+branch_and_bound([], CurrentBestPath, CurrentBestPath).
 
+% Cláusula que é executada quando o estado atual é o estado objetivo.
+% Verifica se o custo do caminho atual é menor que o custo atualmente armazenado.
+% Se for, encontramos um caminho melhor e chamamos branch_and_bound/3 novamente
+% com a lista vazia e o CurrentPath como FinalBestPath.
 branch_and_bound([(CurrentState, CurrentPath, CurrentCost) | Rest], CurrentBestPath, FinalBestPath) :-
     goal_state(CurrentState),
     calculate_path_cost(CurrentPath, PathCost),
     PathCost < CurrentCost,
     branch_and_bound([], CurrentPath, FinalBestPath).
 
-% Cláusula que é executada quando o estado atual é o estado objetivo.
-% Verifica se o custo do caminho atual é menor que o custo atualmente armazenado.
-% Se for, encontramos um caminho melhor e chamamos branch_and_bound/3 novamente
-% com a lista vazia e o CurrentPath como FinalBestPath.
-
+% Cláusula recursiva que expande o estado atual e obtém seus sucessores.
+% Em seguida, anexa os sucessores à lista Rest e à Expanded.
+% Chama branch_and_bound/3 novamente com a nova fila de estados (NewQueue).
 branch_and_bound([(CurrentState, CurrentPath, CurrentCost) | Rest], CurrentBestPath, FinalBestPath) :-
     expand_state((CurrentState, CurrentPath, CurrentCost), Expanded),
     append(Rest, Expanded, NewQueue),
     branch_and_bound(NewQueue, CurrentBestPath, FinalBestPath).
-% Cláusula recursiva que expande o estado atual e obtém seus sucessores.
-% Em seguida, anexa os sucessores à lista Rest e à Expanded.
-% Chama branch_and_bound/3 novamente com a nova fila de estados (NewQueue).
+
 
 start_branch_and_bound(StartState, Path) :-
     branch_and_bound(StartState, TempPath),
