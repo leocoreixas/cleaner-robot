@@ -80,5 +80,5 @@ Onde FinalPath é a variável que irá armazenar o caminho percorrido pelo robô
 
 # Alunos
 
- - [João Victor Simonassi - 217031149](https://github.com/jsimonassi)
- - [Leonardo Coreixas - 217031137](https://github.com/leocoreixas)
+ - [João Victor Simonassi](https://github.com/jsimonassi)
+ - [Leonardo Coreixas](https://github.com/leocoreixas)
