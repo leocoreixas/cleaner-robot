@@ -39,12 +39,14 @@ expand_state((State, Path, _), Successors) :-
         NextCost is PathCost + 1
     ), Successors).
 
-
+%Cláusula inicial. Chama branch_and_bound/3 com a lista de estados a serem explorados
+% Possui apenas DOIS parâmetros. Isso é importante!
 branch_and_bound(CurrentState, Path) :-
     branch_and_bound([(CurrentState, [CurrentState], 0)], [], Path).
 
 % Caso base: quando a lista de estados a serem explorados está vazia,
-% o CurrentBestPath é o melhor caminho encontrado até o momento.
+% Nesse caso, o CurrentBestPath é o melhor caminho encontrado até o momento,
+% então o predicado termina e retorna o CurrentBestPath como FinalBestPath.
 branch_and_bound([], CurrentBestPath, CurrentBestPath).
 
 % Cláusula que é executada quando o estado atual é o estado objetivo.

@@ -44,7 +44,8 @@ expand_state((State, Path, _), Successors) :-
         NextCost is PathCost + Distance
     ), Successors).
 
-
+%Cláusula inicial. Chama a_star/3 com a lista de estados a serem explorados
+% Possui apenas DOIS parâmetros. Isso é importante!
 a_star(CurrentState, Path) :-
     a_star([(CurrentState, [CurrentState], 0)], [], Path).
 
