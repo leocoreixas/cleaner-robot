@@ -1,3 +1,37 @@
+
+% Definição do tamanho da sala
+room_size(4, 4).
+
+% Definição da posição da sujeira
+goal_state((1, 1)).
+
+% Definição da posição do obstáculo
+obstacle(1, 2).
+
+% Verificar se uma posição está dentro do intervalo definido por room_size
+within_bounds(X, Y) :-
+    room_size(RoomWidth, RoomHeight),
+    X >= 1, X =< RoomWidth,
+    Y >= 1, Y =< RoomHeight.
+
+% Gerar todas as posições possíveis dentro do intervalo definido por room_size
+generate_positions(Positions) :-
+    room_size(RoomWidth, RoomHeight),
+    findall((X, Y), (between(1, RoomWidth, X), between(1, RoomHeight, Y)), Positions).
+
+% Verificar se uma posição é um obstáculo
+is_obstacle(X, Y) :-
+    obstacle(X, Y).
+
+% Adicionar o fato noh(indice_xy_do_elemento, 1) para todas as posições que não são obstáculos e estão dentro do intervalo definido por room_size
+add_noh_facts :-
+    generate_positions(Positions),
+    foreach(member((X, Y), Positions), (within_bounds(X, Y), + is_obstacle(X, Y) -> assertz(noh((X, Y), 1)); true)).
+
+
+
+
+
 %Definição das Arestas do Grafo - Slide 38 - Busca Informada e
 %Não-Informada - estado objetivo é o estado F 
 %sG(G(V1,V2),V1,V2) - custo de mudar do estado V1 para o estado V2
@@ -43,7 +77,6 @@ s(V1,V2):-sG(_,V1,V2).
 %Definir o nó (estado) objetivo
 objetivo(f).
 
-maior([_,_,F1|_],[_,_,F2|_]) :- F1 > F2.
 
 /*relações acessórias para processamento de listas*/
 membro(X,[X|_]):-!.
