@@ -35,7 +35,7 @@ manhattan_distance((X1, Y1), (X2, Y2), Distance) :-
 % Definir predicado para avaliar os estados possíveis com base na heurística (distância de Manhattan)
 evaluate_states([State], _, State).
 evaluate_states([State1, State2 | Rest], CurrentState, BestState) :-
-    goal_state(GoalState), % Obter a posição da sujeira. Funciona se tiver mais de uma sujeira?
+    goal_state(GoalState), % Obter a posição da sujeira.
     manhattan_distance(State1, GoalState, Distance1),
     manhattan_distance(State2, GoalState, Distance2),
     manhattan_distance(CurrentState, GoalState, CurrentDistance),
