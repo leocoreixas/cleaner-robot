@@ -37,15 +37,12 @@ choose_next_state(CurrentState, NextState) :-
 
 % Definir predicado para avaliar os estados possíveis com base na heurística (distância de Manhattan)
 evaluate_states([State], State).
-evaluate_states([State1, State2 | Rest], BestState) :-
+evaluate_states(NextStates, NextState) :-
     goal_state(GoalState),
-    manhattan_distance(State1, GoalState, Distance1),
-    manhattan_distance(State2, GoalState, Distance2),
-    (Distance1 =< Distance2 ->
-        evaluate_states([State1 | Rest], BestState)
-    ;
-        evaluate_states([State2 | Rest], BestState)
-    ).
+    map_list_to_pairs(manhattan_distance(GoalState), NextStates, HeuristicPairs),
+    keysort(HeuristicPairs, SortedPairs),
+    pairs_values(SortedPairs, SortedStates),
+    [NextState | _] = SortedStates.
 
 % Definir predicado para buscar o caminho usando a busca Best-First
 best_first(CurrentState, Path) :-

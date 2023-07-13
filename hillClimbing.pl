@@ -39,10 +39,9 @@ manhattan_distance((X1, Y1), (X2, Y2), Distance) :-
 evaluate_states([State], _, State).
 evaluate_states([State1, State2 | Rest], CurrentState, BestState) :-
     goal_state(GoalState), % Obter a posição da sujeira. Funciona se tiver mais de uma sujeira?
-    manhattan_distance(State1, GoalState, Distance1),
-    manhattan_distance(State2, GoalState, Distance2),
-    manhattan_distance(CurrentState, GoalState, CurrentDistance),
-    (Distance1 + CurrentDistance =< Distance2 + CurrentDistance ->
+    manhattan_distance(State1, GoalState, Heuristic1),
+    manhattan_distance(State2, GoalState, Heuristic2),
+    (Heuristic1 =< Heuristic2  ->
         evaluate_states([State1 | Rest], CurrentState, BestState)
     ;
         evaluate_states([State2 | Rest], CurrentState, BestState)
@@ -60,8 +59,6 @@ hill_climbing(CurrentState, Path) :-
     choose_next_state(CurrentState, NextState),
     hill_climbing(NextState, NextPath),
     Path = [CurrentState | NextPath]. % Constrói o caminho
-
-%hill_climbing((0, 0), Path).
 
 hill_climbing_all(CurrentState, FinalPath) :-
     hill_climbing(CurrentState, Path),
