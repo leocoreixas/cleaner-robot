@@ -17,9 +17,6 @@ valid_position((X, Y)) :-
     X >= 0, X < MaxX,
     Y >= 0, Y < MaxY.
 
-% Definir predicado para representar a posição inicial do robô
-%initial_state((0, 0)).
-
 % Definir predicado para gerar os sucessores de um estado
 successor((X, Y), (NextX, Y)) :- NextX is X + 1. % Movimento para a direita
 successor((X, Y), (NextX, Y)) :- NextX is X - 1. % Movimento para a esquerda
