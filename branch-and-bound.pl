@@ -27,7 +27,7 @@ successor((X, Y), (X, NextY)) :- NextY is Y - 1. % Movimento para baixo
 calculate_path_cost([_], 0).
 calculate_path_cost([_, NextState | Path], Cost) :-
     calculate_path_cost([NextState | Path], RestCost),
-    Cost is RestCost.
+    Cost is RestCost + 1.
 
 % Definir predicado para expandir um estado e obter seus sucessores
 expand_state((State, Path, _), Successors) :-
