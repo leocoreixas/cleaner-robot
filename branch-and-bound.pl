@@ -23,15 +23,11 @@ successor((X, Y), (NextX, Y)) :- NextX is X - 1. % Movimento para a esquerda
 successor((X, Y), (X, NextY)) :- NextY is Y + 1. % Movimento para cima
 successor((X, Y), (X, NextY)) :- NextY is Y - 1. % Movimento para baixo
 
-% Definir predicado para calcular a distância de Manhattan entre dois pontos
-manhattan_distance((X1, Y1), (X2, Y2), Distance) :-
-    Distance is abs(X1 - X2) + abs(Y1 - Y2).
-
 % Definir predicado para calcular o custo do caminho atual
 calculate_path_cost([_], 0).
 calculate_path_cost([_, NextState | Path], Cost) :-
     calculate_path_cost([NextState | Path], RestCost),
-    Cost is RestCost + 1.
+    Cost is RestCost.
 
 % Definir predicado para expandir um estado e obter seus sucessores
 expand_state((State, Path, _), Successors) :-
@@ -39,9 +35,8 @@ expand_state((State, Path, _), Successors) :-
         successor(State, NextState),
         valid_position(NextState),
         \+ member(NextState, Path),
-        manhattan_distance(State, NextState, Distance),
         calculate_path_cost([NextState | Path], PathCost),
-        NextCost is PathCost + Distance
+        NextCost is PathCost + 1
     ), Successors).
 
 
