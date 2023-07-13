@@ -2,7 +2,10 @@
 room_size(4,4).
 
 % Definir predicado para representar a posição da sujeira
+:- dynamic(goal_state/1).
 goal_state((1, 1)).
+goal_state((2, 3)).
+goal_state((3, 3)).
 
 % Definir predicado para representar a posição do obstáculo
 obstacle(1, 2).
@@ -45,6 +48,10 @@ evaluate_states([State1, State2 | Rest], CurrentState, BestState) :-
         evaluate_states([State2 | Rest], CurrentState, BestState)
     ).
 
+get_last([X], X).
+get_last([_|Xs], Rest) :-
+    get_last(Xs, Rest).
+
 % Definir predicado para buscar o caminho usando a busca Hill Climbing
 hill_climbing(CurrentState, Path) :-
     goal_state(CurrentState),
@@ -55,3 +62,12 @@ hill_climbing(CurrentState, Path) :-
     Path = [CurrentState | NextPath]. % Constrói o caminho
 
 %hill_climbing((0, 0), Path).
+
+hill_climbing_all(CurrentState, FinalPath) :-
+    hill_climbing(CurrentState, Path),
+    get_last(Path, Result),
+    retract(goal_state(Result)),
+    append(Path, FinalPath, FinalPath).
+
+%Exemplo de saida
+%hill_climbing_all((0,0), FinalPath).
