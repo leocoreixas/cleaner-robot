@@ -86,4 +86,8 @@ branch_and_bound_all(FinalPath) :-
     remove_last(Path, FinalPath).
 
 
-
+%start(FinalPath) :-
+%    statistics(runtime, _),
+%    branch_and_bound_all(FinalPath)
+%    statistics(runtime, [_, ExecutionTime]),
+%    format('Tempo de execução: ~15f segundos', [ExecutionTime/1000]).

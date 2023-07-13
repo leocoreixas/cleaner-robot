@@ -89,3 +89,11 @@ a_star_all(FinalPath) :-
     append([(0,0)], AllGoalPositions, AllStartPositions),
     call_a_star(AllStartPositions, Path),
     remove_last(Path, FinalPath).
+
+
+%start(FinalPath) :-
+%    statistics(runtime, _),
+%    a_star_all(FinalPath),
+%    statistics(runtime, [_, ExecutionTime]),
+%    format('Tempo de execução: ~15f segundos', [ExecutionTime/1000]).
+

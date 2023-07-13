@@ -65,3 +65,9 @@ hill_climbing_all(CurrentState, FinalPath) :-
 
 %Exemplo de saida
 %hill_climbing_all((0,0), FinalPath).
+
+%start(FinalPath) :-
+%    statistics(runtime, _),
+%    hill_climbing_all((0,0), FinalPath),
+%    statistics(runtime, [_, ExecutionTime]),
+%    format('Tempo de execução: ~15f segundos', [ExecutionTime/1000]).

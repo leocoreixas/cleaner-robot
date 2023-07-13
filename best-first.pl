@@ -62,3 +62,9 @@ best_first_all(CurrentState, FinalPath) :-
 
 %Exemplo de chamada
 %best_first_all((0,0), FinalPath).
+
+%start(FinalPath) :-
+%   statistics(runtime, _),
+%    best_first_all((0,0), FinalPath),
+%    statistics(runtime, [_, ExecutionTime]),
+%    format('Tempo de execução: ~15f segundos', [ExecutionTime/1000]).
