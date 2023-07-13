@@ -2,7 +2,10 @@
 room_size(4,4).
 
 % Definir predicado para representar a posição da sujeira
+:- dynamic(goal_state/1).
 goal_state((1, 1)).
+goal_state((2, 3)).
+goal_state((3, 3)).
 
 % Definir predicado para representar a posição do obstáculo
 obstacle(1, 2).
@@ -53,5 +56,15 @@ best_first(CurrentState, Path) :-
     best_first(NextState, NextPath),
     Path = [CurrentState | NextPath]. % Constrói o caminho
 
-% Exemplo de uso:
-best_first((0, 0), Path).
+get_last([X], X).
+get_last([_|Xs], Rest) :-
+    get_last(Xs, Rest).
+
+best_first_all(CurrentState, FinalPath) :-
+    best_first(CurrentState, Path),
+    get_last(Path, Result),
+    retract(goal_state(Result)),
+    append(Path, FinalPath, FinalPath).
+
+%Exemplo de chamada
+%best_first_all((0,0), FinalPath).
