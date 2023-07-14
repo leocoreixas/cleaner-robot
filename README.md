@@ -34,7 +34,7 @@ Ou então utilizar o [SWISH](https://swish.swi-prolog.org/) - Versão online
 ## Soluções implementadas
 
 #### Busca best-first
-
+Arquivo: best-first.pl
 Para executar a busca best-first, basta fazer a seguinte pergunta ao SWI-Prolog:
 
 ```best_first_all((0,0), FinalPath).``` 
@@ -43,6 +43,7 @@ Onde (0,0) é a posição inicial do robô e FinalPath é a variável que irá a
 <hr/>
 
 ### Busca branch-and-bound
+Arquivo: branch-and-bound.pl
 Para executar a busca branch-and-bound, basta fazer a seguinte pergunta ao SWI-Prolog:
 
 ```branch_and_bound_all(FinalPath).``` 
@@ -50,7 +51,8 @@ Para executar a busca branch-and-bound, basta fazer a seguinte pergunta ao SWI-P
 Onde FinalPath é a variável que irá armazenar o caminho percorrido pelo robô.
 <hr/>
 
-### Busca hill-climbing
+### Busca hill-climbing:
+Arquivo: hillClimbing.pl
 Para executar a busca hill-climbing, basta fazer a seguinte pergunta ao SWI-Prolog:
 
 ```hill_climbing_all((0,0), FinalPath).``` 
@@ -59,6 +61,7 @@ Onde (0,0) é a posição inicial do robô e FinalPath é a variável que irá a
 <hr/>
 
 ### Busca A*
+Arquivo: A*V2.pl
 Para executar a busca A*, basta fazer a seguinte pergunta ao SWI-Prolog:
 
 ```a_star_all(FinalPath).``` 
